@@ -19,6 +19,14 @@ def srcs_list(library_name, exclude):
 def hdr_list(library_name, exclude = []):
     return native.glob(["libs/%s/include/boost/**" % library_name], exclude = exclude, allow_empty = True)
 
+def _get_linkstatic(linkstatic):
+    if linkstatic != None:
+        return linkstatic
+    return select({
+        ":linkstatic": True,
+        "//conditions:default": False,
+    })
+
 def boost_library(
         name,
         boost_name = None,
@@ -30,6 +38,7 @@ def boost_library(
         exclude_hdr = [],
         exclude_src = [],
         visibility = ["//visibility:public"],
+        linkstatic = None,
         **kwargs):
     if boost_name == None:
         boost_name = name
@@ -43,6 +52,7 @@ def boost_library(
         srcs = srcs_list(boost_name, exclude_src) + srcs,
         copts = default_copts + copts,
         licenses = ["notice"],
+        linkstatic = _get_linkstatic(linkstatic),
         **kwargs
     )
 
